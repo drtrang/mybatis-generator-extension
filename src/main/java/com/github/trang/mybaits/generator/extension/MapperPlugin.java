@@ -129,15 +129,13 @@ public class MapperPlugin extends PluginAdapter {
     public boolean clientGenerated(Interface interfaze, TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
         //获取实体类
         FullyQualifiedJavaType entityType = new FullyQualifiedJavaType(introspectedTable.getBaseRecordType());
-        //添加@Repository注解
-        interfaze.addAnnotation("@Repository");
+        //添加@Mapper注解
+        interfaze.addAnnotation("@Mapper");
         //import接口
-        interfaze.addImportedType(new FullyQualifiedJavaType("org.springframework.stereotype.Repository"));
-        //添加主键引用
-        interfaze.addImportedType(new FullyQualifiedJavaType("java.lang.Long"));
+        interfaze.addImportedType(new FullyQualifiedJavaType("org.apache.ibatis.annotations.Mapper"));
         for (String mapper : mappers) {
             interfaze.addImportedType(new FullyQualifiedJavaType(mapper));
-            interfaze.addSuperInterface(new FullyQualifiedJavaType(mapper + "<" + entityType.getShortName() + ", Long>"));
+            interfaze.addSuperInterface(new FullyQualifiedJavaType(mapper + "<" + entityType.getShortName() + ">"));
         }
         //import实体类
         interfaze.addImportedType(entityType);

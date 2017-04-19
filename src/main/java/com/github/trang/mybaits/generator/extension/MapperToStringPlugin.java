@@ -21,6 +21,7 @@ public class MapperToStringPlugin extends PluginAdapter {
     //排除不需要生成toString的属性
     private static final Set<String> EXCLUDE_COLUMNS = new HashSet<String>() {
         private static final long serialVersionUID = 1L;
+
         {
             add("serialVersionUID");
         }
