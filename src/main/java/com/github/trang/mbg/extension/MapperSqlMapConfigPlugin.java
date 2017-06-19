@@ -1,4 +1,4 @@
-package com.github.trang.mybaits.generator.extension;
+package com.github.trang.mbg.extension;
 
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
@@ -13,15 +13,12 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * 自定义MBG Mapping插件
- * 完善通用Mapper生成的Mapping文件，加入Base_Columns属性
+ * Mapper.xml 生成器
+ *   1. 加入Base_Columns属性
  *
  * @author trang
  */
 public class MapperSqlMapConfigPlugin extends PluginAdapter {
-
-    public MapperSqlMapConfigPlugin() {
-    }
 
     @Override
     public void setContext(Context context) {
@@ -39,7 +36,7 @@ public class MapperSqlMapConfigPlugin extends PluginAdapter {
     }
 
     /**
-     * 生成Mapping文件中的Element
+     * 生成 Mapping 文件中的 Element
      */
     @Override
     public boolean sqlMapDocumentGenerated(Document document, IntrospectedTable introspectedTable) {
@@ -48,20 +45,17 @@ public class MapperSqlMapConfigPlugin extends PluginAdapter {
     }
 
     /**
-     * 生成包含全部列的sql元素
-     *
-     * @param document
-     * @param introspectedTable
+     * 生成包含全部列的 sql 元素
      */
     private void generateSqlBaseColumns(Document document, IntrospectedTable introspectedTable) {
         //获取根元素
         XmlElement rootElement = document.getRootElement();
-        //新建sql元素标签
+        //新建 sql 元素标签
         XmlElement sqlElement = new XmlElement("sql");
-        //新建sql元素属性
+        //新建 sql 元素属性
         Attribute attr = new Attribute("id", "BaseColumns");
         sqlElement.addAttribute(attr);
-        //新建sql元素内容
+        //新建 sql 元素内容
         TextElement comment = new TextElement("<!-- WARNING - @mbg.generated -->");
         //获取全部列名称
         StringBuilder columnsBuilder = new StringBuilder();
@@ -73,7 +67,9 @@ public class MapperSqlMapConfigPlugin extends PluginAdapter {
         TextElement content = new TextElement(columns);
         sqlElement.addElement(comment);
         sqlElement.addElement(content);
-        //将sql元素放到根元素下
+        //将 sql 元素放到根元素下
+        rootElement.addElement(new TextElement(""));
         rootElement.addElement(sqlElement);
     }
+
 }

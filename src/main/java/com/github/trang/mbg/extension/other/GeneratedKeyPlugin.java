@@ -1,4 +1,4 @@
-package com.github.trang.mybaits.generator.extension.other;
+package com.github.trang.mbg.extension.other;
 
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
