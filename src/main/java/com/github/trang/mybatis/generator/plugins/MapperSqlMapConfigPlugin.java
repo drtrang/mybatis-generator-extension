@@ -1,4 +1,4 @@
-package com.github.trang.mbg.extension;
+package com.github.trang.mybatis.generator.plugins;
 
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;

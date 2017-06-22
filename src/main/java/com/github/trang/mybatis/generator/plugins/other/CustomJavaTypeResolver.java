@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.trang.mbg.extension.other;
+package com.github.trang.mybatis.generator.plugins.other;
 
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.JavaTypeResolver;

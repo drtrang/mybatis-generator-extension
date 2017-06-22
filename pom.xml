@@ -36,14 +36,14 @@
     </scm>
 
     <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <url>http://maven.lianjia.com/content/repositories/Lianjia-Iprd-Releases/</url>
-        </repository>
         <snapshotRepository>
-            <id>snapshots</id>
-            <url>http://maven.lianjia.com/content/repositories/Lianjia-Iprd-Snapshots/</url>
+            <id>oss</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>oss</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 
     <properties>
@@ -174,16 +174,6 @@
                     </plugin>
                 </plugins>
             </build>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>oss</id>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-                </snapshotRepository>
-                <repository>
-                    <id>oss</id>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
         </profile>
     </profiles>
 
