@@ -93,7 +93,7 @@ public class ServicePlugin extends PluginAdapter {
         clazz.addImportedType(entityType);
         clazz.addImportedType(new FullyQualifiedJavaType(service));
         clazz.addImportedType(new FullyQualifiedJavaType("org.springframework.stereotype.Service"));
-        clazz.addAnnotation("@Service(\"" + firstLetterLowerCase(domainObjectName) + "\")");
+        clazz.addAnnotation("@Service(\"" + firstLetterLowerCase(domainObjectName + "Service") + "\")");
         clazz.setVisibility(JavaVisibility.PUBLIC);
         clazz.setSuperClass(new FullyQualifiedJavaType(
                 baseServiceImpl + "<" + entityType.getShortName() + "," + primaryType.getShortName() + ">"));
