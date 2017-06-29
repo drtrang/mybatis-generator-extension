@@ -29,10 +29,11 @@ import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.*;
 import org.mybatis.generator.api.dom.xml.TextElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
-import org.mybatis.generator.config.MergeConstants;
 import org.mybatis.generator.internal.util.StringUtility;
 
 import java.util.Properties;
+
+import static com.github.trang.mybatis.generator.plugins.Constants.WARNING;
 
 /**
  * 给 xml 文件和 domain 文件生成注释
@@ -44,9 +45,6 @@ import java.util.Properties;
  */
 public class CommentGenerator implements org.mybatis.generator.api.CommentGenerator {
 
-    private String beginningDelimiter = "";
-    private String endingDelimiter = "";
-
     public CommentGenerator() {
         super();
     }
@@ -55,36 +53,10 @@ public class CommentGenerator implements org.mybatis.generator.api.CommentGenera
      * xml 文件的注释
      */
     public void addComment(XmlElement xmlElement) {
-        xmlElement.addElement(new TextElement("<!-- WARNING - @mbg.generated -->"));
+        xmlElement.addElement(new TextElement(WARNING));
     }
 
-    public void addConfigurationProperties(Properties properties) {
-        String beginningDelimiter = properties.getProperty("beginningDelimiter");
-        if (StringUtility.stringHasValue(beginningDelimiter)) {
-            this.beginningDelimiter = beginningDelimiter;
-        }
-        String endingDelimiter = properties.getProperty("endingDelimiter");
-        if (StringUtility.stringHasValue(endingDelimiter)) {
-            this.endingDelimiter = endingDelimiter;
-        }
-    }
-
-    public String getDelimiterName(String name) {
-        return beginningDelimiter + name + endingDelimiter;
-    }
-
-    /**
-     * 删除标记
-     */
-    protected void addJavadocTag(JavaElement javaElement, boolean markAsDoNotDelete) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(" * ");
-        sb.append(MergeConstants.NEW_ELEMENT_TAG);
-        if (markAsDoNotDelete) {
-            sb.append(" do_not_delete_during_merge");
-        }
-        javaElement.addJavaDocLine(sb.toString());
-    }
+    public void addConfigurationProperties(Properties properties) {}
 
     /**
      * 给 domain 文件中的字段添加数据库备注
@@ -114,9 +86,6 @@ public class CommentGenerator implements org.mybatis.generator.api.CommentGenera
     public void addSetterComment(Method method, IntrospectedTable introspectedTable, IntrospectedColumn
             introspectedColumn) {}
 
-    /**
-     * Example 使用
-     */
     public void addClassComment(InnerClass innerClass, IntrospectedTable introspectedTable, boolean
             markAsDoNotDelete) {}
     public void addClassComment(InnerClass innerClass, IntrospectedTable introspectedTable) {}
@@ -130,4 +99,5 @@ public class CommentGenerator implements org.mybatis.generator.api.CommentGenera
     public void addRootComment(XmlElement rootElement) {}
 
     public void addJavaFileComment(CompilationUnit compilationUnit) {}
+
 }

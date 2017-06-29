@@ -5,24 +5,21 @@ import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.dom.java.*;
 import org.mybatis.generator.internal.util.StringUtility;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import static com.github.trang.mybatis.generator.plugins.Constants.SERIAL_VERSION_UID;
+
 /**
- * 自定义 MBG toString() 插件
  * 使用 Guava 的 ToStringHelper 生成 toString() 方法
  *
  * @author trang
  */
-public class MapperToStringPlugin extends PluginAdapter {
+public class GuavaToStringPlugin extends PluginAdapter {
 
-    //排除不需要生成toString的属性
-    private static final List<String> EXCLUDE_COLUMNS = new ArrayList<>();
-
-    static {
-        EXCLUDE_COLUMNS.add("serialVersionUID");
-    }
+    // 排除不需要生成 toString() 的属性
+    private static final List<String> NON_TO_STRING_FIELDS = Collections.singletonList(SERIAL_VERSION_UID);
 
     private boolean useToStringFromRoot;
 
@@ -38,8 +35,8 @@ public class MapperToStringPlugin extends PluginAdapter {
     }
 
     @Override
-    public boolean modelBaseRecordClassGenerated(TopLevelClass topLevelClass, IntrospectedTable
-            introspectedTable) {
+    public boolean modelBaseRecordClassGenerated(TopLevelClass topLevelClass,
+                                                 IntrospectedTable introspectedTable) {
         generateToString(introspectedTable, topLevelClass);
         return true;
     }
@@ -52,8 +49,8 @@ public class MapperToStringPlugin extends PluginAdapter {
     }
 
     @Override
-    public boolean modelPrimaryKeyClassGenerated(TopLevelClass topLevelClass, IntrospectedTable
-            introspectedTable) {
+    public boolean modelPrimaryKeyClassGenerated(TopLevelClass topLevelClass,
+                                                 IntrospectedTable introspectedTable) {
         generateToString(introspectedTable, topLevelClass);
         return true;
     }
@@ -62,9 +59,9 @@ public class MapperToStringPlugin extends PluginAdapter {
      * 生成 toString() 方法
      */
     private void generateToString(IntrospectedTable introspectedTable, TopLevelClass topLevelClass) {
+        topLevelClass.addImportedType("com.google.common.base.MoreObjects");
         // 首先创建一个 Method 对象，注意，这个 Method 是 org.mybatis.generator.api.dom.java.Method，
-        // 这个 Method 是 MBG 中对对象 DOM 的一个抽象
-        // 因为我们要添加方法，所以先创建一个
+        // 这个 Method 是 MBG 中对对象 DOM 的一个抽象，因为我们要添加方法，所以先创建一个
         Method method = new Method();
 
         // 设置这个方法的可见性为 public，代码已经在一步一步构建这个方法了
@@ -78,9 +75,9 @@ public class MapperToStringPlugin extends PluginAdapter {
         // 设置方法的名称，至此，方法签名已经装配完成
         method.setName("toString");
 
-        // 判断当前MBG运行的环境是否支持 Java5（这里就可以看出来 IntrospectedTable 类的作用了，主要是查询生成环境的作用）
+        // 判断当前 MBG 运行的环境是否支持 Java5（这里就可以看出来 IntrospectedTable 类的作用了，主要是查询生成环境的作用）
         if (introspectedTable.isJava5Targeted()) {
-            // 如果支持 Java5，就在方法上面生成一个@Override标签
+            // 如果支持 Java5，就在方法上面生成一个 @Override 标签
             method.addAnnotation("@Override");
         }
 
@@ -97,25 +94,29 @@ public class MapperToStringPlugin extends PluginAdapter {
         method.addBodyLine("return MoreObjects.toStringHelper(this).omitNullValues()");
 
         StringBuilder builder = new StringBuilder();
-        // 通过 topLevelClass 得到当前类的所有字段，注意，这里的 Field 是org.mybatis.generator.api.dom.java.Field
+        // 通过 topLevelClass 得到当前类的所有字段，注意，这里的 Field 是 org.mybatis.generator.api.dom.java.Field
         // 这个 Field 是 MBG 对字段的一个 DOM 封装
         for (Field field : topLevelClass.getFields()) {
-            // 重置 StringBuilder；
+            // 重置 StringBuilder
             builder.setLength(0);
-            // 得到字段的名称；
+            // 得到字段的名称
             String fieldName = field.getName();
-            // 添加字段的输出代码；
-            if (!EXCLUDE_COLUMNS.contains(fieldName)) {
-                builder.append(".add(\"").append(fieldName).append("\", ").append(fieldName).append(")");
+            // 添加字段的输出代码
+            if (!NON_TO_STRING_FIELDS.contains(fieldName)) {
+                builder.append("        .add(\"")
+                        .append(fieldName)
+                        .append("\", ")
+                        .append(fieldName)
+                        .append(")");
                 method.addBodyLine(builder.toString());
             }
         }
         // 如果实体类有父类，则调用父类的 toString() 方法
         if ((this.useToStringFromRoot) && (topLevelClass.getSuperClass() != null)) {
-            method.addBodyLine(".add(\"super class\", super.toString())");
+            method.addBodyLine("        .add(\"super class\", super.toString())");
         }
         // 把这个字段的 toString 输出到代码中；所以才看到我们最后生成的代码结果中，每一个字段在 toString 方法中各占一行；
-        method.addBodyLine(".toString();");
+        method.addBodyLine("        .toString();");
 
         // 把拼装好的方法 DOM 添加到 topLevelClass 中，完成方法添加；
         topLevelClass.addMethod(method);
