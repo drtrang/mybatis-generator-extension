@@ -135,12 +135,9 @@ public class MapperPlugin extends PluginAdapter {
                 topLevelClass.addAnnotation("@Builder");
             } else if (accessors) {
                 topLevelClass.addAnnotation("@Accessors(fluent = true)");
-                topLevelClass.addAnnotation("@Getter");
-                topLevelClass.addAnnotation("@Setter");
-            } else {
-                topLevelClass.addAnnotation("@Getter");
-                topLevelClass.addAnnotation("@Setter");
             }
+            topLevelClass.addAnnotation("@Getter");
+            topLevelClass.addAnnotation("@Setter");
         }
         // 是否忽略大小写，对于区分大小写的数据库，会有用
         if (caseSensitive && !topLevelClass.getType().getShortName().equals(tableName)) {
