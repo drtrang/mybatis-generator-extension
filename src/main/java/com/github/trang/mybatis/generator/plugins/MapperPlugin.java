@@ -9,30 +9,39 @@ import org.mybatis.generator.config.CommentGeneratorConfiguration;
 import org.mybatis.generator.config.Context;
 import org.mybatis.generator.internal.util.StringUtility;
 
+import java.text.MessageFormat;
 import java.util.*;
 
 /**
  * 通用 Mapper 生成器
- *   1. Mapper 接口增加 @Mapper 注解
- *   2. domain 类增加 Lombok 特性
- *   3. 通用 Mapper 相关内容全部已到此插件
+ * 1. Mapper 接口增加 @Mapper 注解
+ * 2. domain 类增加 Lombok 特性
+ * 3. 通用 Mapper 相关内容全部已到此插件
  *
  * @author trang
  */
 public class MapperPlugin extends PluginAdapter {
 
-    private Set<String> mappers = new HashSet<>();
-    private boolean caseSensitive = false;
+    // 开始的分隔符，例如 mysql 为 `，sql server 为 [
     private String beginningDelimiter = "";
+    // 结束的分隔符，例如 mysql 为 `，sql server 为 ]
     private String endingDelimiter = "";
+    // 通用 Mapper 接口
+    private Set<String> mappers = new HashSet<>();
+    // caseSensitive 默认 false，当数据库表名区分大小写时，可以将该属性设置为 true
+    private boolean caseSensitive = false;
+    // 强制生成注解，默认 false，设置为 true 后一定会生成 @Table 和 @Column 注解
+    private boolean forceAnnotation = false;
     // 数据库模式
     private String schema;
-    // Lombok 插件
-    private boolean lombok = false;
-    private boolean builder = false;
-    private boolean accessors = false;
+    // Lombok 插件模式
+    private LombokType lombok = LombokType.none;
     // 注释生成器
     private CommentGeneratorConfiguration configuration;
+
+    enum LombokType {
+        none, simple, builder, accessors
+    }
 
     @Override
     public void setContext(Context context) {
@@ -48,30 +57,38 @@ public class MapperPlugin extends PluginAdapter {
     @Override
     public void setProperties(Properties properties) {
         super.setProperties(properties);
-        String mappers = this.properties.getProperty("mappers");
-        if (StringUtility.stringHasValue(mappers)) {
-            Collections.addAll(this.mappers, mappers.split(","));
-        } else {
-            throw new RuntimeException("Mapper插件缺少必要的mappers属性!");
-        }
-        this.caseSensitive = StringUtility.isTrue(this.properties.getProperty("caseSensitive"));
+
         String beginningDelimiter = this.properties.getProperty("beginningDelimiter");
         if (StringUtility.stringHasValue(beginningDelimiter)) {
             this.beginningDelimiter = beginningDelimiter;
         }
         configuration.addProperty("beginningDelimiter", this.beginningDelimiter);
+
         String endingDelimiter = this.properties.getProperty("endingDelimiter");
         if (StringUtility.stringHasValue(endingDelimiter)) {
             this.endingDelimiter = endingDelimiter;
         }
         configuration.addProperty("endingDelimiter", this.endingDelimiter);
+
+        String mappers = this.properties.getProperty("mappers");
+        if (StringUtility.stringHasValue(mappers)) {
+            Collections.addAll(this.mappers, mappers.split(","));
+        } else {
+            throw new RuntimeException("Mapper 插件缺少必要的 mappers 属性!");
+        }
+
         String schema = this.properties.getProperty("schema");
         if (StringUtility.stringHasValue(schema)) {
             this.schema = schema;
         }
-        this.lombok = StringUtility.isTrue(this.properties.getProperty("lombok"));
-        this.builder = StringUtility.isTrue(this.properties.getProperty("builder"));
-        this.accessors = StringUtility.isTrue(this.properties.getProperty("accessors"));
+
+        this.forceAnnotation = StringUtility.isTrue(this.properties.getProperty("forceAnnotation"));
+        this.caseSensitive = StringUtility.isTrue(this.properties.getProperty("caseSensitive"));
+
+        String lombok = this.properties.getProperty("lombok");
+        if (StringUtility.stringHasValue(lombok)) {
+            this.lombok = LombokType.valueOf(lombok);
+        }
     }
 
     public String getDelimiterName(String name) {
@@ -115,30 +132,58 @@ public class MapperPlugin extends PluginAdapter {
      * 处理实体类的包和 @Table 注解
      */
     private void processEntityClass(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
-        if (lombok) {
-            topLevelClass.addImportedType("lombok.*");
-            if (accessors) {
+        // import Lombok
+        switch (lombok) {
+            case none:
+                break;
+            case simple:
+                topLevelClass.addImportedType("lombok.*");
+                break;
+            case builder:
+                topLevelClass.addImportedType("lombok.*");
+                break;
+            case accessors:
+                topLevelClass.addImportedType("lombok.*");
                 topLevelClass.addImportedType("lombok.experimental.Accessors");
-            }
+                break;
+            default:
+                break;
         }
+        // import JPA
         topLevelClass.addImportedType("javax.persistence.*");
+
         String tableName = introspectedTable.getFullyQualifiedTableNameAtRuntime();
         // 如果包含空格，或者需要分隔符，需要完善
         if (StringUtility.stringContainsSpace(tableName)) {
             tableName = context.getBeginningDelimiter() + tableName + context.getEndingDelimiter();
         }
-        // 是否开启 lombok
-        if (lombok) {
-            topLevelClass.addAnnotation("@NoArgsConstructor");
-            if (builder) {
+
+        // 添加 Lombok 注解
+        switch (lombok) {
+            case none:
+                break;
+            case builder:
+                topLevelClass.addAnnotation("@NoArgsConstructor");
                 topLevelClass.addAnnotation("@AllArgsConstructor(access = AccessLevel.PRIVATE)");
                 topLevelClass.addAnnotation("@Builder");
-            } else if (accessors) {
+                topLevelClass.addAnnotation("@Getter");
+                topLevelClass.addAnnotation("@Setter");
+                break;
+            case accessors:
+                topLevelClass.addAnnotation("@NoArgsConstructor");
                 topLevelClass.addAnnotation("@Accessors(fluent = true)");
-            }
-            topLevelClass.addAnnotation("@Getter");
-            topLevelClass.addAnnotation("@Setter");
+                topLevelClass.addAnnotation("@Getter");
+                topLevelClass.addAnnotation("@Setter");
+                break;
+            case simple:
+                topLevelClass.addAnnotation("@NoArgsConstructor");
+                topLevelClass.addAnnotation("@Getter");
+                topLevelClass.addAnnotation("@Setter");
+                break;
+            default:
+                break;
         }
+
         // 是否忽略大小写，对于区分大小写的数据库，会有用
         if (caseSensitive && !topLevelClass.getType().getShortName().equals(tableName)) {
             topLevelClass.addAnnotation("@Table(name = \"" + getDelimiterName(tableName) + "\")");
@@ -147,6 +192,8 @@ public class MapperPlugin extends PluginAdapter {
         } else if (StringUtility.stringHasValue(schema)
                 || StringUtility.stringHasValue(beginningDelimiter)
                 || StringUtility.stringHasValue(endingDelimiter)) {
+            topLevelClass.addAnnotation("@Table(name = \"" + getDelimiterName(tableName) + "\")");
+        } else if (forceAnnotation) {
             topLevelClass.addAnnotation("@Table(name = \"" + getDelimiterName(tableName) + "\")");
         }
     }
@@ -185,7 +232,8 @@ public class MapperPlugin extends PluginAdapter {
      * 处理实体类的字段
      */
     @Override
-    public boolean modelFieldGenerated(Field field, TopLevelClass topLevelClass, IntrospectedColumn introspectedColumn, IntrospectedTable introspectedTable, ModelClassType modelClassType) {
+    public boolean modelFieldGenerated(Field field, TopLevelClass topLevelClass, IntrospectedColumn
+            introspectedColumn, IntrospectedTable introspectedTable, ModelClassType modelClassType) {
         // 添加注解
         if (field.isTransient()) {
             field.addAnnotation("@Transient");
@@ -206,24 +254,22 @@ public class MapperPlugin extends PluginAdapter {
         // @Column
         if (!column.equals(introspectedColumn.getJavaProperty())) {
             field.addAnnotation("@Column(name = \"" + getDelimiterName(column) + "\")");
-        } else if (StringUtility.stringHasValue(beginningDelimiter) ||
-                StringUtility.stringHasValue(endingDelimiter)) {
+        } else if (StringUtility.stringHasValue(beginningDelimiter) || StringUtility.stringHasValue(endingDelimiter)) {
+            field.addAnnotation("@Column(name = \"" + getDelimiterName(column) + "\")");
+        } else if (forceAnnotation){
             field.addAnnotation("@Column(name = \"" + getDelimiterName(column) + "\")");
         }
         if (introspectedColumn.isIdentity()) {
-            if (introspectedTable.getTableConfiguration()
-                    .getGeneratedKey()
-                    .getRuntimeSqlStatement()
-                    .equals("JDBC")) {
+            if (introspectedTable.getTableConfiguration().getGeneratedKey().getRuntimeSqlStatement().equals("JDBC")) {
                 field.addAnnotation("@GeneratedValue(generator = \"JDBC\")");
             } else {
                 field.addAnnotation("@GeneratedValue(strategy = GenerationType.IDENTITY)");
             }
         } else if (introspectedColumn.isSequenceColumn()) {
-            field.addAnnotation("@SequenceGenerator(name=\"\",sequenceName=\"" + introspectedTable
-                    .getTableConfiguration()
-                    .getGeneratedKey()
-                    .getRuntimeSqlStatement() + "\")");
+            //在 Oracle 中，如果需要是 SEQ_TABLENAME，那么可以配置为 select SEQ_{1} from dual
+            String tableName = introspectedTable.getFullyQualifiedTableNameAtRuntime();
+            String sql = MessageFormat.format(introspectedTable.getTableConfiguration().getGeneratedKey().getRuntimeSqlStatement(), tableName, tableName.toUpperCase());
+            field.addAnnotation("@GeneratedValue(strategy = GenerationType.IDENTITY, generator = \"" + sql + "\")");
         }
         return true;
     }
@@ -231,12 +277,12 @@ public class MapperPlugin extends PluginAdapter {
     // 下面所有 return false 的方法都不生成。这些都是基础的 CRUD 方法，使用通用 Mapper 实现
     @Override
     public boolean modelGetterMethodGenerated(Method method, TopLevelClass topLevelClass, IntrospectedColumn introspectedColumn, IntrospectedTable introspectedTable, ModelClassType modelClassType) {
-        return !lombok;
+        return lombok == LombokType.none;
     }
 
     @Override
     public boolean modelSetterMethodGenerated(Method method, TopLevelClass topLevelClass, IntrospectedColumn introspectedColumn, IntrospectedTable introspectedTable, ModelClassType modelClassType) {
-        return !lombok;
+        return lombok == LombokType.none;
     }
 
     @Override
