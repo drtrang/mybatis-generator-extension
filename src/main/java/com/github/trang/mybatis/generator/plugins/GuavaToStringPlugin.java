@@ -18,7 +18,7 @@ import static com.github.trang.mybatis.generator.plugins.Constants.SERIAL_VERSIO
  */
 public class GuavaToStringPlugin extends PluginAdapter {
 
-    // 排除不需要生成 toString() 的属性
+    /** 排除不需要生成 toString() 的属性 */
     private static final List<String> NON_TO_STRING_FIELDS = Collections.singletonList(SERIAL_VERSION_UID);
 
     private boolean useToStringFromRoot;

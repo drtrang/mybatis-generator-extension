@@ -24,13 +24,16 @@ public class GeneratedKeyPlugin extends PluginAdapter {
         generate();
     }
 
+    @Override
     public boolean validate(List<String> warnings) {
         this.includes = this.properties.getProperty("includes");
         this.excludes = this.properties.getProperty("excludes");
         return true;
     }
 
-    public boolean sqlMapInsertSelectiveElementGenerated(XmlElement element, IntrospectedTable introspectedTable) {
+    @Override
+    public boolean sqlMapInsertSelectiveElementGenerated(XmlElement element, IntrospectedTable
+            introspectedTable) {
         String tableName = introspectedTable.getFullyQualifiedTable().getFullyQualifiedTableNameAtRuntime();
         if ((this.excludes != null) && (tableName.matches(this.excludes))) {
             return super.sqlMapInsertSelectiveElementGenerated(element, introspectedTable);
@@ -38,20 +41,21 @@ public class GeneratedKeyPlugin extends PluginAdapter {
         if ((this.includes != null) && (tableName.matches(this.includes))) {
             List<IntrospectedColumn> lst = introspectedTable.getPrimaryKeyColumns();
             if (lst.size() == 1) {
-                addGeneratedKeyAttr(element, ((IntrospectedColumn) lst.get(0)).getActualColumnName());
+                addGeneratedKeyAttr(element, (lst.get(0)).getActualColumnName());
             }
             return super.sqlMapInsertSelectiveElementGenerated(element, introspectedTable);
         }
         if ((this.includes == null) && (this.excludes == null)) {
             List<IntrospectedColumn> lst = introspectedTable.getPrimaryKeyColumns();
             if (lst.size() == 1) {
-                addGeneratedKeyAttr(element, ((IntrospectedColumn) lst.get(0)).getActualColumnName());
+                addGeneratedKeyAttr(element, (lst.get(0)).getActualColumnName());
             }
             return super.sqlMapInsertSelectiveElementGenerated(element, introspectedTable);
         }
         return super.sqlMapInsertSelectiveElementGenerated(element, introspectedTable);
     }
 
+    @Override
     public boolean sqlMapInsertElementGenerated(XmlElement element, IntrospectedTable introspectedTable) {
         String tableName = introspectedTable.getFullyQualifiedTable().getFullyQualifiedTableNameAtRuntime();
         if ((this.excludes != null) && (tableName.matches(this.excludes))) {
@@ -60,14 +64,14 @@ public class GeneratedKeyPlugin extends PluginAdapter {
         if ((this.includes != null) && (tableName.matches(this.includes))) {
             List<IntrospectedColumn> lst = introspectedTable.getPrimaryKeyColumns();
             if (lst.size() == 1) {
-                addGeneratedKeyAttr(element, ((IntrospectedColumn) lst.get(0)).getActualColumnName());
+                addGeneratedKeyAttr(element, (lst.get(0)).getActualColumnName());
             }
             return super.sqlMapInsertElementGenerated(element, introspectedTable);
         }
         if ((this.includes == null) && (this.excludes == null)) {
             List<IntrospectedColumn> lst = introspectedTable.getPrimaryKeyColumns();
             if (lst.size() == 1) {
-                addGeneratedKeyAttr(element, ((IntrospectedColumn) lst.get(0)).getActualColumnName());
+                addGeneratedKeyAttr(element, (lst.get(0)).getActualColumnName());
             }
             return super.sqlMapInsertElementGenerated(element, introspectedTable);
         }
@@ -78,4 +82,5 @@ public class GeneratedKeyPlugin extends PluginAdapter {
         element.addAttribute(new Attribute("useGeneratedKeys", "true"));
         element.addAttribute(new Attribute("keyProperty", pk));
     }
+
 }

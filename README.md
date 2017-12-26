@@ -11,7 +11,6 @@
 <dependency>
     <groupId>com.github.drtrang</groupId>
     <artifactId>mybatis-generator-extension</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.4</version>
 </dependency>
 ```
-

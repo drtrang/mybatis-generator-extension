@@ -25,6 +25,7 @@ public class SerializablePlugin extends PluginAdapter {
         gwtSerializable = new FullyQualifiedJavaType("com.google.gwt.user.client.rpc.IsSerializable");
     }
 
+    @Override
     public boolean validate(List<String> warnings) {
         return true;
     }

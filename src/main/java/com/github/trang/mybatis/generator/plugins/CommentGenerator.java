@@ -28,15 +28,18 @@ public class CommentGenerator implements org.mybatis.generator.api.CommentGenera
     /**
      * xml 文件的注释
      */
+    @Override
     public void addComment(XmlElement xmlElement) {
         xmlElement.addElement(new TextElement(WARNING));
     }
 
+    @Override
     public void addConfigurationProperties(Properties properties) {}
 
     /**
      * 给 domain 文件中的字段添加数据库备注
      */
+    @Override
     public void addFieldComment(Field field, IntrospectedTable introspectedTable, IntrospectedColumn
             introspectedColumn) {
         if (StringUtility.stringHasValue(introspectedColumn.getRemarks())) {
@@ -53,27 +56,40 @@ public class CommentGenerator implements org.mybatis.generator.api.CommentGenera
     /**
      * getter 方法注释
      */
+    @Override
     public void addGetterComment(Method method, IntrospectedTable introspectedTable, IntrospectedColumn
             introspectedColumn) {}
 
     /**
      * setter 方法注释
      */
+    @Override
     public void addSetterComment(Method method, IntrospectedTable introspectedTable, IntrospectedColumn
             introspectedColumn) {}
 
+    @Override
     public void addClassComment(InnerClass innerClass, IntrospectedTable introspectedTable, boolean
             markAsDoNotDelete) {}
+
+    @Override
     public void addClassComment(InnerClass innerClass, IntrospectedTable introspectedTable) {}
+
+    @Override
     public void addFieldComment(Field field, IntrospectedTable introspectedTable) {}
+
+    @Override
     public void addEnumComment(InnerEnum innerEnum, IntrospectedTable introspectedTable) {}
 
+    @Override
     public void addModelClassComment(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {}
 
+    @Override
     public void addGeneralMethodComment(Method method, IntrospectedTable introspectedTable) {}
 
+    @Override
     public void addRootComment(XmlElement rootElement) {}
 
+    @Override
     public void addJavaFileComment(CompilationUnit compilationUnit) {}
 
 }

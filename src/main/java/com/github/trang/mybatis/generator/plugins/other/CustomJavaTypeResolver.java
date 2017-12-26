@@ -12,7 +12,6 @@ import java.sql.Types;
 import java.util.*;
 
 /**
- *
  * @author trang
  */
 public class CustomJavaTypeResolver implements JavaTypeResolver {
