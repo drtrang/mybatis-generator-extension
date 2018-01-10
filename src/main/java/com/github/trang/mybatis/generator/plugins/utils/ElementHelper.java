@@ -20,6 +20,7 @@ public class ElementHelper {
     public static void addAuthorTag(JavaElement element, boolean markAsDoNotDelete) {
         element.addJavaDocLine("/**");
         element.addJavaDocLine(" * ");
+        element.addJavaDocLine(" * ");
         if (markAsDoNotDelete) {
             element.addJavaDocLine(" * " + MergeConstants.NEW_ELEMENT_TAG);
         }
