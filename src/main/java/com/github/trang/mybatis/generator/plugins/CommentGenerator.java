@@ -5,6 +5,7 @@ import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.*;
 import org.mybatis.generator.api.dom.xml.TextElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
+import org.mybatis.generator.config.MergeConstants;
 import org.mybatis.generator.internal.util.StringUtility;
 
 import java.util.Properties;
@@ -37,7 +38,7 @@ public class CommentGenerator implements org.mybatis.generator.api.CommentGenera
     public void addConfigurationProperties(Properties properties) {}
 
     /**
-     * 给 domain 文件中的字段添加数据库备注
+     * 给 Model 中的字段添加数据库备注
      */
     @Override
     public void addFieldComment(Field field, IntrospectedTable introspectedTable, IntrospectedColumn introspectedColumn) {
@@ -48,6 +49,7 @@ public class CommentGenerator implements org.mybatis.generator.api.CommentGenera
             for (String s : remarks) {
                 field.addJavaDocLine(" * " + s);
             }
+            field.addJavaDocLine(" * " + MergeConstants.NEW_ELEMENT_TAG);
             field.addJavaDocLine(" */");
         }
     }
@@ -65,26 +67,41 @@ public class CommentGenerator implements org.mybatis.generator.api.CommentGenera
     public void addSetterComment(Method method, IntrospectedTable introspectedTable, IntrospectedColumn introspectedColumn) {}
 
     @Override
-    public void addClassComment(InnerClass innerClass, IntrospectedTable introspectedTable, boolean markAsDoNotDelete) {}
+    public void addClassComment(InnerClass innerClass, IntrospectedTable introspectedTable, boolean markAsDoNotDelete) {
+    }
 
     @Override
-    public void addClassComment(InnerClass innerClass, IntrospectedTable introspectedTable) {}
+    public void addClassComment(InnerClass innerClass, IntrospectedTable introspectedTable) {
+    }
 
     @Override
-    public void addEnumComment(InnerEnum innerEnum, IntrospectedTable introspectedTable) {}
+    public void addEnumComment(InnerEnum innerEnum, IntrospectedTable introspectedTable) {
+    }
 
     @Override
-    public void addFieldComment(Field field, IntrospectedTable introspectedTable) {}
+    public void addModelClassComment(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
+        String objectName = introspectedTable.getFullyQualifiedTable().getDomainObjectName();
+        topLevelClass.addJavaDocLine("/**");
+        topLevelClass.addJavaDocLine(" * " + objectName);
+        topLevelClass.addJavaDocLine(" * ");
+        topLevelClass.addJavaDocLine(" * @author mbg");
+        topLevelClass.addJavaDocLine(" */");
+    }
 
     @Override
-    public void addModelClassComment(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {}
+    public void addFieldComment(Field field, IntrospectedTable introspectedTable) {
+    }
 
     @Override
-    public void addGeneralMethodComment(Method method, IntrospectedTable introspectedTable) {}
+    public void addGeneralMethodComment(Method method, IntrospectedTable introspectedTable) {
+    }
 
     @Override
     public void addRootComment(XmlElement rootElement) {}
 
+    /**
+     * 文件注释
+     */
     @Override
     public void addJavaFileComment(CompilationUnit compilationUnit) {}
 

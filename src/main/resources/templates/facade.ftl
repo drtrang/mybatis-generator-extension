@@ -1,10 +1,10 @@
 package ${package};
 
 /**
+ * ${tableClass.shortClassName}${mapperSuffix}
  *
- *
- * @author
+ * @author mbg
  */
-public interface ${tableClass.shortClassName}${suffix} {
+public interface ${tableClass.shortClassName}${mapperSuffix} {
 
 }

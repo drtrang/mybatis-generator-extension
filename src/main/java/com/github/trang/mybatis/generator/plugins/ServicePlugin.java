@@ -1,5 +1,6 @@
 package com.github.trang.mybatis.generator.plugins;
 
+import com.github.trang.mybatis.generator.plugins.utils.ElementHelper;
 import org.mybatis.generator.api.GeneratedJavaFile;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
@@ -77,9 +78,11 @@ public class ServicePlugin extends PluginAdapter {
         // 设置作用域
         interfaze.setVisibility(JavaVisibility.PUBLIC);
         // import
+        interfaze.addImportedType(new FullyQualifiedJavaType(baseService));
         interfaze.addImportedType(entityType);
         interfaze.addSuperInterface(new FullyQualifiedJavaType(
                 baseService + "<" + entityType.getShortName() + "," + primaryType.getShortName() + ">"));
+        ElementHelper.addAuthorTag(interfaze, false);
         return new GeneratedJavaFile(interfaze, targetProject, new DefaultJavaFormatter());
     }
 
@@ -90,6 +93,7 @@ public class ServicePlugin extends PluginAdapter {
         String service = targetPackage + "." + domainObjectName + "Service";
         String serviceImpl = targetPackage + ".impl." + domainObjectName + "ServiceImpl";
         TopLevelClass clazz = new TopLevelClass(new FullyQualifiedJavaType(serviceImpl));
+        clazz.addImportedType(new FullyQualifiedJavaType(baseServiceImpl));
         clazz.addImportedType(entityType);
         clazz.addImportedType(new FullyQualifiedJavaType(service));
         clazz.addImportedType(new FullyQualifiedJavaType("org.springframework.stereotype.Service"));
@@ -98,6 +102,7 @@ public class ServicePlugin extends PluginAdapter {
         clazz.setSuperClass(new FullyQualifiedJavaType(
                 baseServiceImpl + "<" + entityType.getShortName() + "," + primaryType.getShortName() + ">"));
         clazz.addSuperInterface(new FullyQualifiedJavaType(service));
+        ElementHelper.addAuthorTag(clazz, false);
         return new GeneratedJavaFile(clazz, targetProject, new DefaultJavaFormatter());
     }
 

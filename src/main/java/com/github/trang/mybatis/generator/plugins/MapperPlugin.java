@@ -1,5 +1,6 @@
 package com.github.trang.mybatis.generator.plugins;
 
+import com.github.trang.mybatis.generator.plugins.utils.ElementHelper;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.*;
@@ -8,7 +9,10 @@ import org.mybatis.generator.config.Context;
 import org.mybatis.generator.internal.util.StringUtility;
 
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * 通用 Mapper 生成器
@@ -119,6 +123,7 @@ public class MapperPlugin extends FalseMethodPlugin {
             // 添加父类
             interfaze.addSuperInterface(new FullyQualifiedJavaType(mapper + "<" + entityType.getShortName() + ">"));
         }
+        ElementHelper.addAuthorTag(interfaze, false);
         return true;
     }
 
