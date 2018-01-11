@@ -42,16 +42,16 @@ public class CommentGenerator implements org.mybatis.generator.api.CommentGenera
      */
     @Override
     public void addFieldComment(Field field, IntrospectedTable introspectedTable, IntrospectedColumn introspectedColumn) {
+        field.addJavaDocLine("/**");
         if (StringUtility.stringHasValue(introspectedColumn.getRemarks())) {
-            field.addJavaDocLine("/**");
             String remark = introspectedColumn.getRemarks();
             String[] remarks = remark.split("\r\n");
             for (String s : remarks) {
                 field.addJavaDocLine(" * " + s);
             }
-            ElementHelper.addMergeTag(field, false);
-            field.addJavaDocLine(" */");
         }
+        ElementHelper.addMergeTag(field, false);
+        field.addJavaDocLine(" */");
     }
 
     /**
