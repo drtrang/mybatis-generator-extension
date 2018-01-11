@@ -123,7 +123,10 @@ public class MapperPlugin extends FalseMethodPlugin {
             // 添加父类
             interfaze.addSuperInterface(new FullyQualifiedJavaType(mapper + "<" + entityType.getShortName() + ">"));
         }
+        interfaze.addJavaDocLine("/**");
+        interfaze.addJavaDocLine(" * " + interfaze.getType().getShortName());
         ElementHelper.addAuthorTag(interfaze, false);
+        interfaze.addJavaDocLine(" */");
         return true;
     }
 

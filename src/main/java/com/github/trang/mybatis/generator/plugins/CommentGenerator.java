@@ -1,11 +1,11 @@
 package com.github.trang.mybatis.generator.plugins;
 
+import com.github.trang.mybatis.generator.plugins.utils.ElementHelper;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.*;
 import org.mybatis.generator.api.dom.xml.TextElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
-import org.mybatis.generator.config.MergeConstants;
 import org.mybatis.generator.internal.util.StringUtility;
 
 import java.util.Properties;
@@ -49,7 +49,7 @@ public class CommentGenerator implements org.mybatis.generator.api.CommentGenera
             for (String s : remarks) {
                 field.addJavaDocLine(" * " + s);
             }
-            field.addJavaDocLine(" * " + MergeConstants.NEW_ELEMENT_TAG);
+            ElementHelper.addMergeTag(field, false);
             field.addJavaDocLine(" */");
         }
     }
@@ -83,8 +83,7 @@ public class CommentGenerator implements org.mybatis.generator.api.CommentGenera
         String objectName = introspectedTable.getFullyQualifiedTable().getDomainObjectName();
         topLevelClass.addJavaDocLine("/**");
         topLevelClass.addJavaDocLine(" * " + objectName);
-        topLevelClass.addJavaDocLine(" * ");
-        topLevelClass.addJavaDocLine(" * @author mbg");
+        ElementHelper.addAuthorTag(topLevelClass, false);
         topLevelClass.addJavaDocLine(" */");
     }
 
