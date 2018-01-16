@@ -24,12 +24,12 @@ public class ElementHelper {
         element.addJavaDocLine(" * ");
         StringBuilder sb = new StringBuilder();
         sb.append(" * ");
+        element.addJavaDocLine(" * @author mbg");
         sb.append(MergeConstants.NEW_ELEMENT_TAG);
         if (markAsDoNotDelete) {
             sb.append(" do_not_delete_during_merge");
         }
         element.addJavaDocLine(sb.toString());
-        element.addJavaDocLine(" * @author mbg");
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String s = format.format(new Date());
         element.addJavaDocLine(" * @since " + s);
