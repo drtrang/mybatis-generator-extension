@@ -7,7 +7,9 @@ import org.mybatis.generator.api.dom.xml.Attribute;
 import org.mybatis.generator.api.dom.xml.Document;
 import org.mybatis.generator.api.dom.xml.TextElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
+import org.mybatis.generator.codegen.mybatis3.MyBatis3FormattingUtilities;
 import org.mybatis.generator.config.Context;
+import org.mybatis.generator.internal.util.StringUtility;
 
 import java.util.List;
 import java.util.Properties;
@@ -20,6 +22,9 @@ import java.util.Properties;
  */
 public class MapperSqlMapConfigPlugin extends PluginAdapter {
 
+    /** sql 标签的 id 属性 */
+    private String id = "BaseColumns";
+
     @Override
     public void setContext(Context context) {
         super.setContext(context);
@@ -28,6 +33,12 @@ public class MapperSqlMapConfigPlugin extends PluginAdapter {
     @Override
     public void setProperties(Properties properties) {
         super.setProperties(properties);
+
+        String id = this.properties.getProperty("id");
+        if (StringUtility.stringHasValue(id)) {
+            this.id = id;
+        }
+
     }
 
     @Override
@@ -48,27 +59,25 @@ public class MapperSqlMapConfigPlugin extends PluginAdapter {
      * 生成包含全部列的 sql 元素
      */
     private void generateSqlBaseColumns(Document document, IntrospectedTable introspectedTable) {
-        // 获取根元素
-        XmlElement rootElement = document.getRootElement();
         // 新建 sql 元素标签
         XmlElement sqlElement = new XmlElement("sql");
         // 新建 sql 元素属性
-        Attribute attr = new Attribute("id", "BaseColumns");
+        Attribute attr = new Attribute("id", id);
         sqlElement.addAttribute(attr);
-        // 新建 sql 元素内容
-        TextElement comment = new TextElement("<!-- WARNING - @mbg.generated -->");
+        // 新建 sql 元素内容，填写注释
+        sqlElement.addElement(new TextElement(Constants.WARNING));
         // 获取全部列名称
         StringBuilder columnsBuilder = new StringBuilder();
         List<IntrospectedColumn> columnList = introspectedTable.getAllColumns();
         for (IntrospectedColumn column : columnList) {
-            columnsBuilder.append(column.getActualColumnName()).append(", ");
+            columnsBuilder.append(MyBatis3FormattingUtilities.getSelectListPhrase(column)).append(", ");
         }
         // 删除最后一个逗号
         String columns = columnsBuilder.substring(0, columnsBuilder.length() - 2);
-        TextElement content = new TextElement(columns);
-        sqlElement.addElement(comment);
-        sqlElement.addElement(content);
+        // 新建 sql 元素内容，填写列名称
+        sqlElement.addElement(new TextElement(columns));
         // 将 sql 元素放到根元素下
+        XmlElement rootElement = document.getRootElement();
         rootElement.addElement(new TextElement(""));
         rootElement.addElement(sqlElement);
         rootElement.addElement(new TextElement(""));
