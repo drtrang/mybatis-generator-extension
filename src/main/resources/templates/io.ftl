@@ -40,7 +40,6 @@ public class ${tableClass.shortClassName}IO extends BaseIO<${pkField.shortTypeNa
     </#list>
 </#if>
     @Override
-    @Transient
     public ${pkField.shortTypeName} getPk() {
         return ${pkField.fieldName};
     }
